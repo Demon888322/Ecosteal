@@ -1,0 +1,45 @@
+copyright: "its_Demon"
+economy:
+  starting-balance: 100
+  risk-steal-percent: 0.05
+  risk-steal-cap: 500.0
+  kill-reward-cooldown-seconds: 1800
+  combat-tag-seconds: 15
+  transaction-history-limit: 1000
+mining:
+  gem-drop-chance: 0.03
+sell-prices:
+  IRON_INGOT: 2.0
+  GOLD_INGOT: 3.0
+  DIAMOND: 20.0
+  EMERALD: 12.0
+  COAL: 0.5
+heist:
+  default-duration-minutes: 15
+  extraction-seconds: 10
+  objective-cooldown-seconds: 20
+  objective-reward-min: 100
+  objective-reward-max: 250
+  max-bag-value: 5000
+contracts:
+  daily:
+    mining:
+      target: 32
+      reward: 150
+    risk:
+      target: 1
+      reward: 250
+    heist:
+      target: 1
+      reward: 5
+gear:
+  ability-cooldown-seconds: 12
+  scout-outgoing-damage-multiplier: 1.15
+  scout-incoming-damage-multiplier: 1.15
+  bulwark-incoming-damage-multiplier: 0.8
+zones:
+  safe_mine: {}
+  risk_mine: {}
+  bank: {}
+  heist_objective: {}
+  extraction: {}

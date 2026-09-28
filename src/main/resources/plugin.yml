@@ -1,0 +1,31 @@
+name: EcostealCore2
+version: 2.0.0
+main: com.ecosteal.core.EcoStealCore
+api-version: '1.21.11'
+description: Ecosteal Core 2 economy, PvP risk, heists, contracts, and custom gear.
+authors: [its_Demon]
+softdepend: [Vault, Geyser-Spigot, floodgate]
+commands:
+  eco:
+    description: View and manage your cash wallet and bank.
+    usage: /eco <balance|deposit|withdraw|pay>
+  baltop:
+    description: View the top players by cash balance.
+    usage: /baltop
+  gear:
+    description: Give custom gear to a player.
+    usage: /gear <give|upgrade>
+  ecoadmin:
+    description: Inspect transactions, configure zones, and manage currency.
+    usage: /ecoadmin <transactions|give|zone>
+    permission: ecosteal.admin
+  heist:
+    description: Join the active vault event, loot objectives, and extract.
+    usage: /heist <start|stop|loot|extract>
+  contract:
+    description: View and claim daily contracts.
+    usage: /contract [list] | /contract claim <mining|risk|heist>
+permissions:
+  ecosteal.admin:
+    description: Manage Ecosteal systems.
+    default: op
