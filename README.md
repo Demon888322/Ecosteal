@@ -14,11 +14,15 @@
 - Wallet, protected bank, gems, and crowns, with transaction history
 - Vault economy bridge for wallet cash; bank balances stay protected
 - Safe and risk mining zones, including configurable PvP cash theft
+- Higher configurable gem-drop odds in risk mines than safe mines
 - Timed heists with extraction, recoverable bags, restart persistence, and a live countdown bar
 - UTC daily contracts for mining, risk-zone PvP, and heist extractions
+- Heist challenge awards configurable Crowns; farming crops can be sold for Cash
 - Custom weapons, armor sets, and gem upgrades
 - Crossplay-friendly right-click abilities; Geyser is optional
 - SQLite account storage with automatic import of legacy YAML data
+- Persistent kill, best-streak, successful-extraction, and playtime leaderboards
+- A first-join guide to core earning, banking, upgrade, and risk commands
 
 ## Requirements
 
@@ -39,7 +43,7 @@
 
 ### Upgrade from an earlier release
 
-On first startup, Ecosteal Core 2 copies existing configuration, economy, contract, and heist state files from `plugins/Ecosteal` or `plugins/EcoStealCore` when matching files are not already present in `plugins/EcostealCore2`. Legacy account and transaction YAML is imported into `economy.db` once; the original files are left in place as backups.
+On first startup, Ecosteal Core 2 copies existing configuration, economy, contract, heist, and player-stat files from `plugins/Ecosteal` or `plugins/EcoStealCore` when matching files are not already present in `plugins/EcostealCore2`. Legacy account and transaction YAML is imported into `economy.db` once; the original files are left in place as backups.
 
 ## Configure zones
 
@@ -65,6 +69,7 @@ Zone coordinates are unset by default. Configure all required corners before pla
 | `/eco deposit <amount or all>` | Move wallet cash into the bank at a bank zone. |
 | `/eco withdraw <amount or all>` | Move bank cash into your wallet at a bank zone. |
 | `/baltop` | View the top wallet-plus-bank cash balances. |
+| `/ecotop [cash\|kills\|streak\|heists\|playtime]` | View cash or gameplay leaderboards. |
 | `/gear upgrade` | Upgrade held custom gear using gems. |
 | `/heist loot` | Collect loot at an active objective. |
 | `/heist extract` | Start extraction while carrying a heist bag. |
@@ -85,5 +90,6 @@ Zone coordinates are unset by default. Configure all required corners before pla
 - `plugins/EcostealCore2/economy.db`: account balances and transaction history
 - `plugins/EcostealCore2/contracts.yml`: daily contract progress
 - `plugins/EcostealCore2/heist-state.yml`: active event and carried bag state
+- `plugins/EcostealCore2/player-stats.yml`: kills, streaks, heists, and playtime
 
-Other plugins can award currency through the public `EcoStealCore#getEconomy().reward(player, currency, amount, reason)` service. Vault exposes wallet cash only; protected bank funds are intentionally excluded.
+Other plugins can award currency through the public `EcoStealCore#getEconomy().reward(player, currency, amount, reason)` service. Use your ranks/shop plugins to sell Crowns for cosmetic ranks, titles, and effects; this plugin does not provide purchasable combat advantages. Vault exposes wallet cash only; protected bank funds are intentionally excluded. Land claims, spawn protection, ranks, shop displays, and Java/Bedrock access are configured by the server's respective plugins (including Geyser/Floodgate for Bedrock).

@@ -50,6 +50,8 @@ public final class ContractService {
         int target = target(id);
         if (data.getBoolean(path + ".claimed") || data.getInt(path + ".progress") < target) return false;
         economy.reward(player, currency(id), reward(id), "daily " + id + " contract");
+        double crownReward = Math.max(0, plugin.getConfig().getDouble("contracts.daily." + id + ".crowns", 0));
+        if (crownReward > 0) economy.reward(player, EconomyService.Currency.CROWNS, crownReward, "daily " + id + " contract challenge");
         data.set(path + ".claimed", true);
         save();
         player.sendMessage(ChatColor.GREEN + "Contract reward claimed: " + rewardText(id) + ".");
@@ -101,8 +103,10 @@ public final class ContractService {
     }
 
     private String rewardText(String id) {
-        return (currency(id) == EconomyService.Currency.CASH ? "$" : "") + reward(id) + " "
-                + currency(id).name().toLowerCase(java.util.Locale.ROOT);
+        String text = (currency(id) == EconomyService.Currency.CASH ? "$" : "") + reward(id) + " "
+            + currency(id).name().toLowerCase(java.util.Locale.ROOT);
+        double crownReward = Math.max(0, plugin.getConfig().getDouble("contracts.daily." + id + ".crowns", 0));
+        return crownReward > 0 ? text + " + " + crownReward + " crowns" : text;
     }
 
     private String description(String id) {

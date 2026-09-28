@@ -12,6 +12,9 @@ commands:
   baltop:
     description: View the top players by cash balance.
     usage: /baltop
+  ecotop:
+    description: View cash, kills, streaks, heists, or playtime leaderboards.
+    usage: /ecotop [cash|kills|streak|heists|playtime]
   gear:
     description: Give custom gear to a player.
     usage: /gear <give|upgrade>

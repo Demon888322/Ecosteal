@@ -22,16 +22,18 @@ public final class GameplayListener implements Listener {
     private final JavaPlugin plugin;
     private final EconomyService economy;
     private final ContractService contracts;
+    private final PlayerStatsService stats;
     private final ZoneManager zones;
     private final HeistService heists;
     private final GearService gear;
     private final CombatTracker combat;
     private final Random random = new Random();
 
-    public GameplayListener(JavaPlugin plugin, EconomyService economy, ContractService contracts, ZoneManager zones, HeistService heists, GearService gear, CombatTracker combat) {
+    public GameplayListener(JavaPlugin plugin, EconomyService economy, ContractService contracts, PlayerStatsService stats, ZoneManager zones, HeistService heists, GearService gear, CombatTracker combat) {
         this.plugin = plugin;
         this.economy = economy;
         this.contracts = contracts;
+        this.stats = stats;
         this.zones = zones;
         this.heists = heists;
         this.gear = gear;
@@ -66,8 +68,10 @@ public final class GameplayListener implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
         heists.dropBag(victim, victim.getLocation());
-        Player killer = victim.getKiller();
-        if (killer == null || !zones.contains("risk_mine", victim.getLocation()) || !diedToPlayer(victim, killer)) return;
+        Player killer = diedToPlayer(victim, victim.getKiller()) ? victim.getKiller() : null;
+        stats.playerDied(victim, killer);
+        if (killer == null || !zones.contains("risk_mine", victim.getLocation())
+            || !zones.contains("risk_mine", killer.getLocation())) return;
         long now = System.currentTimeMillis();
         String cooldownPath = "risk-kill-cooldowns." + killer.getUniqueId() + "." + victim.getUniqueId();
         if (plugin.getConfig().getLong(cooldownPath, 0) > now) {
@@ -94,7 +98,10 @@ public final class GameplayListener implements Listener {
         if (player.getGameMode() == org.bukkit.GameMode.CREATIVE) return;
         if (zones.contains("safe_mine", event.getBlock().getLocation()) || zones.contains("risk_mine", event.getBlock().getLocation())) {
             contracts.mine(player);
-            double chance = plugin.getConfig().getDouble("mining.gem-drop-chance", 0.03);
+                String chancePath = zones.contains("risk_mine", event.getBlock().getLocation())
+                    ? "mining.risk-gem-drop-chance" : "mining.gem-drop-chance";
+                double chance = Math.max(0, Math.min(1, plugin.getConfig().getDouble(chancePath,
+                    zones.contains("risk_mine", event.getBlock().getLocation()) ? 0.07 : 0.03)));
             if (random.nextDouble() < chance) {
                 economy.reward(player, EconomyService.Currency.GEMS, 1, "mine block: " + event.getBlock().getType());
                 player.sendMessage(ChatColor.AQUA + "+1 gem");
@@ -117,14 +124,19 @@ public final class GameplayListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        stats.join(player);
         heists.onJoin(player);
         if (player.hasPlayedBefore()) return;
         double startingBalance = plugin.getConfig().getDouble("economy.starting-balance", 100);
         economy.reward(player, EconomyService.Currency.CASH, startingBalance, "first-join starting balance");
+        player.sendMessage(ChatColor.GOLD + "Welcome to Ecosteal!");
+        player.sendMessage(ChatColor.YELLOW + "Earn cash with /eco sell, protect savings at a bank, and upgrade custom gear with gems using /gear upgrade.");
+        player.sendMessage(ChatColor.YELLOW + "Try /contract, /ecotop, and /heist. Cash in your wallet can be lost in risk mines; bank savings are protected.");
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        stats.quit(event.getPlayer());
         heists.cancelExtraction(event.getPlayer(), null);
         heists.dropBag(event.getPlayer(), event.getPlayer().getLocation());
     }

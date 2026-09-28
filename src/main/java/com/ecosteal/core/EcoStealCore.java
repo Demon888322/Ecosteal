@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 public final class EcoStealCore extends JavaPlugin {
     private EconomyService economy;
     private ContractService contracts;
+    private PlayerStatsService stats;
     private ZoneManager zones;
     private HeistService heists;
     private GearService gear;
@@ -23,14 +24,16 @@ public final class EcoStealCore extends JavaPlugin {
         saveConfig();
         economy = new EconomyService(this);
         contracts = new ContractService(this, economy);
+        stats = new PlayerStatsService(this);
         zones = new ZoneManager(this);
-        heists = new HeistService(this, economy, zones, contracts);
+        heists = new HeistService(this, economy, zones, contracts, stats);
         gear = new GearService(this);
         combat = new CombatTracker(this);
 
-        getServer().getPluginManager().registerEvents(new GameplayListener(this, economy, contracts, zones, heists, gear, combat), this);
+        getServer().getPluginManager().registerEvents(new GameplayListener(this, economy, contracts, stats, zones, heists, gear, combat), this);
         getCommand("eco").setExecutor(new CoreCommand(this, economy, zones, combat));
         getCommand("baltop").setExecutor(new BalanceTopCommand(economy));
+        getCommand("ecotop").setExecutor(new EcoTopCommand(economy, stats));
         getCommand("ecoadmin").setExecutor(new AdminCommand(this, economy, zones, heists));
         getCommand("heist").setExecutor(new HeistCommand(this, heists, zones));
         getCommand("contract").setExecutor(new ContractCommand(contracts));
@@ -51,7 +54,7 @@ public final class EcoStealCore extends JavaPlugin {
         for (String folderName : new String[]{"Ecosteal", "EcoStealCore"}) {
             File oldFolder = new File(getDataFolder().getParentFile(), folderName);
             if (!oldFolder.isDirectory() || oldFolder.equals(getDataFolder())) continue;
-            for (String name : new String[]{"config.yml", "accounts.yml", "transactions.yml", "economy.db", "economy.db-wal", "economy.db-shm", "contracts.yml", "heist-state.yml"}) {
+            for (String name : new String[]{"config.yml", "accounts.yml", "transactions.yml", "economy.db", "economy.db-wal", "economy.db-shm", "contracts.yml", "heist-state.yml", "player-stats.yml"}) {
                 File source = new File(oldFolder, name);
                 File destination = new File(getDataFolder(), name);
                 if (!source.isFile() || destination.exists()) continue;
@@ -69,6 +72,7 @@ public final class EcoStealCore extends JavaPlugin {
     public void onDisable() {
         getServer().getServicesManager().unregisterAll(this);
         if (heists != null) heists.shutdown();
+        if (stats != null) stats.shutdown();
         if (economy != null) economy.close();
     }
 }

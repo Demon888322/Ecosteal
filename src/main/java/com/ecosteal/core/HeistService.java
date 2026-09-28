@@ -29,6 +29,7 @@ public final class HeistService {
     private final JavaPlugin plugin;
     private final EconomyService economy;
     private final ContractService contracts;
+    private final PlayerStatsService stats;
     private final ZoneManager zones;
     private final NamespacedKey bagKey;
     private final NamespacedKey eventKey;
@@ -45,10 +46,11 @@ public final class HeistService {
     private BossBar eventBar;
     private BukkitTask timerTask;
 
-    public HeistService(JavaPlugin plugin, EconomyService economy, ZoneManager zones, ContractService contracts) {
+    public HeistService(JavaPlugin plugin, EconomyService economy, ZoneManager zones, ContractService contracts, PlayerStatsService stats) {
         this.plugin = plugin;
         this.economy = economy;
         this.contracts = contracts;
+        this.stats = stats;
         this.zones = zones;
         bagKey = new NamespacedKey(plugin, "heist_bag");
         eventKey = new NamespacedKey(plugin, "heist_event");
@@ -179,6 +181,7 @@ public final class HeistService {
                 saveState();
                 economy.reward(player, EconomyService.Currency.CASH, reward, "heist extraction");
                 contracts.extract(player);
+                stats.successfulHeist(player);
                 player.sendMessage(ChatColor.GREEN + "Extraction complete. $" + reward + " deposited to your wallet.");
             }
         }, 20L, 20L);
